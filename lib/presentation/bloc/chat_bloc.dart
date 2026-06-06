@@ -1,17 +1,18 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/entities/agent_role.dart';
-import '../../domain/entities/final_answer.dart';
-import '../../domain/entities/internal_step.dart';
-import '../../domain/entities/reflection_step.dart';
-import '../../domain/entities/stopped_reason.dart';
-import '../../domain/usecases/reflect_agent_usecase.dart';
-import '../../domain/repositories/settings_repository.dart';
-import '../../domain/entities/time_preset.dart';
-import 'chat_event.dart';
-import 'chat_state.dart';
+import 'package:reflexive/domain/entities/agent_role.dart';
+import 'package:reflexive/domain/entities/final_answer.dart';
+import 'package:reflexive/domain/entities/internal_step.dart';
+import 'package:reflexive/domain/entities/reflection_step.dart';
+import 'package:reflexive/domain/entities/stopped_reason.dart';
+import 'package:reflexive/domain/usecases/reflect_agent_usecase.dart';
+import 'package:reflexive/domain/repositories/settings_repository.dart';
+import 'package:reflexive/domain/entities/time_preset.dart';
+import 'package:reflexive/presentation/bloc/chat_event.dart';
+import 'package:reflexive/presentation/bloc/chat_state.dart';
 
+/// BLoC that manages the chat state and reflection process.
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ReflectAgentUseCase _reflectAgentUseCase;
   final SettingsRepository _settingsRepository;
@@ -27,6 +28,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<CancelReflection>(_onCancelReflection);
   }
 
+  /// Handles the [SendUserMessage] event to start the reflection loop.
   Future<void> _onSendUserMessage(
     SendUserMessage event,
     Emitter<ChatState> emit,
@@ -35,15 +37,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final steps = <InternalStep>[];
     final stopwatch = Stopwatch()..start();
 
-    // Читаем настройки из репозитория
+    // Read settings from the repository
     final maxDurationSeconds = _settingsRepository.getMaxDuration();
     final reflectionMode = _settingsRepository.getReflectionMode();
 
-    // Создаем кастомный пресет на основе настроек
+    // Create a custom preset based on user settings
     final effectivePreset = TimePreset(
-      name: "Настраиваемый",
+      name: "Custom",
       maxDuration: Duration(seconds: maxDurationSeconds),
-      maxIterations: event.timePreset.maxIterations, // Или тоже вынести в настройки
+      maxIterations: event.timePreset.maxIterations,
     );
 
     emit(ChatReflecting(
@@ -82,11 +84,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         },
       );
 
-      // После завершения стрима (если не было ошибки)
+      // After the stream completes (if no error occurred)
       if (state is ChatReflecting) {
         final reflectingState = state as ChatReflecting;
         
-        // Определяем причину остановки
+        // Determine the stop reason
         StoppedReason reason = StoppedReason.noImprovement;
         if (_cancelToken?.isCancelled == true) {
           reason = StoppedReason.userCancelled;
@@ -98,7 +100,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           reason = StoppedReason.maxIterations;
         }
 
-        // Находим лучший ответ (последний от генератора)
+        // Find the best answer (the last one from the generator)
         String finalContent = "";
         for (var i = steps.length - 1; i >= 0; i--) {
           if (steps[i].role == AgentRole.generator) {
@@ -127,6 +129,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     }
   }
 
+  /// Handles the [CancelReflection] event to abort the current process.
   void _onCancelReflection(CancelReflection event, Emitter<ChatState> emit) {
     _cancelToken?.cancel();
   }

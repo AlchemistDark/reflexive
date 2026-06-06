@@ -1,15 +1,23 @@
-import '../entities/agent_role.dart';
-import '../entities/chat_message.dart';
-import '../entities/reflection_mode.dart';
-import '../entities/reflection_step.dart';
-import '../entities/time_preset.dart';
-import '../repositories/llm_repository.dart';
+import 'package:reflexive/domain/entities/agent_role.dart';
+import 'package:reflexive/domain/entities/chat_message.dart';
+import 'package:reflexive/domain/entities/reflection_mode.dart';
+import 'package:reflexive/domain/entities/reflection_step.dart';
+import 'package:reflexive/domain/entities/time_preset.dart';
+import 'package:reflexive/domain/repositories/llm_repository.dart';
 
+/// Use case that implements the iterative reflection loop (Generator/Critic roles).
 class ReflectAgentUseCase {
+  /// The repository used to interact with the Language Model.
   final LlmRepository llmRepository;
 
   ReflectAgentUseCase({required this.llmRepository});
 
+  /// Executes the reflection loop for a given [query].
+  ///
+  /// Returns a [Stream] of [ReflectionStep] containing intermediate results.
+  /// [timePreset] defines the constraints (duration and iterations).
+  /// [mode] defines the strategy used by the Critic agent.
+  /// [cancelToken] can be used to abort the process.
   Stream<ReflectionStep> execute({
     required String query,
     required TimePreset timePreset,
@@ -19,9 +27,9 @@ class ReflectAgentUseCase {
     final stopwatch = Stopwatch()..start();
     final timeBudget = timePreset.maxDuration.inMilliseconds;
 
-    // 1. Первая генерация
+    // 1. Initial generation
     String currentAnswer = await llmRepository.generate(
-      systemPrompt: "Ты полезный ассистент. Дай точный и развернутый ответ на вопрос пользователя.",
+      systemPrompt: "You are a helpful assistant. Provide an accurate and detailed answer to the user's question.",
       messages: [ChatMessage(role: "user", content: query)],
       cancelToken: cancelToken,
     );
@@ -39,15 +47,15 @@ class ReflectAgentUseCase {
       iteration++;
       if (iteration > timePreset.maxIterations) break;
 
-      // 2. Критика (в зависимости от режима)
+      // 2. Critique (depending on the mode)
       final String criticSystemPrompt;
       if (mode == ReflectionMode.devilsAdvocate) {
-        criticSystemPrompt = "Ты — 'Адвокат дьявола'. Твоя задача — найти 3 самых слабых места в текущем ответе, "
-            "выявить логические пробелы и поставить под сомнение аргументацию. "
-            "Будь строгим, но конструктивным. Если ответ безупречен, напиши только: NO_ISSUES";
+        criticSystemPrompt = "You are a 'Devil's Advocate'. Your task is to find the 3 weakest points in the current response, "
+            "identify logical gaps, and question the argumentation. "
+            "Be strict but constructive. If the response is flawless, write only: NO_ISSUES";
       } else {
-        criticSystemPrompt = "Проанализируй текущий ответ на вопрос. Найди логические ошибки, фактические неточности или способы сделать ответ лучше. "
-            "Если ответ не требует правок и полностью раскрывает тему, напиши только одно слово: NO_ISSUES";
+        criticSystemPrompt = "Analyze the current answer to the question. Find logical errors, factual inaccuracies, or ways to make the answer better. "
+            "If the answer requires no changes and fully covers the topic, write only one word: NO_ISSUES";
       }
 
       final critique = await llmRepository.generate(
@@ -55,7 +63,7 @@ class ReflectAgentUseCase {
         messages: [
           ChatMessage(
             role: "user",
-            content: "Вопрос пользователя: $query\nТекущий ответ: $currentAnswer",
+            content: "User question: $query\nCurrent answer: $currentAnswer",
           )
         ],
         cancelToken: cancelToken,
@@ -70,13 +78,13 @@ class ReflectAgentUseCase {
 
       if (critique.trim().toUpperCase().contains("NO_ISSUES")) break;
 
-      // 3. Генерация исправленного ответа
+      // 3. Generation of improved answer
       final improved = await llmRepository.generate(
-        systemPrompt: "Исправь и улучши ответ на основе полученной критики.",
+        systemPrompt: "Correct and improve the answer based on the received critique.",
         messages: [
           ChatMessage(role: "user", content: query),
           ChatMessage(role: "assistant", content: currentAnswer),
-          ChatMessage(role: "user", content: "Критика: $critique"),
+          ChatMessage(role: "user", content: "Critique: $critique"),
         ],
         cancelToken: cancelToken,
       );
@@ -94,6 +102,7 @@ class ReflectAgentUseCase {
     }
   }
 
+  /// Calculates the remaining duration based on the budget and elapsed time.
   Duration _getRemaining(Stopwatch sw, int budgetMs) {
     final remaining = budgetMs - sw.elapsedMilliseconds;
     return Duration(milliseconds: remaining > 0 ? remaining : 0);

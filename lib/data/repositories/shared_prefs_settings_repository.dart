@@ -1,12 +1,14 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../domain/entities/reflection_mode.dart';
-import '../../domain/repositories/settings_repository.dart';
+import 'package:reflexive/domain/entities/reflection_mode.dart';
+import 'package:reflexive/domain/repositories/settings_repository.dart';
 
+/// Implementation of [SettingsRepository] using [SharedPreferences] for persistent storage.
 class SharedPrefsSettingsRepository implements SettingsRepository {
   final SharedPreferences _prefs;
   static const _keyMaxDuration = 'max_duration';
   static const _keyReflectionMode = 'reflection_mode';
 
+  /// Creates a new instance of [SharedPrefsSettingsRepository].
   SharedPrefsSettingsRepository(this._prefs);
 
   @override

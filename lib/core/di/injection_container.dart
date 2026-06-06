@@ -1,15 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../data/repositories/dio_llm_repository.dart';
-import '../../data/repositories/shared_prefs_settings_repository.dart';
-import '../../domain/repositories/llm_repository.dart';
-import '../../domain/repositories/settings_repository.dart';
-import '../../domain/usecases/reflect_agent_usecase.dart';
-import '../../presentation/bloc/chat_bloc.dart';
+import 'package:reflexive/data/repositories/dio_llm_repository.dart';
+import 'package:reflexive/data/repositories/shared_prefs_settings_repository.dart';
+import 'package:reflexive/domain/repositories/llm_repository.dart';
+import 'package:reflexive/domain/repositories/settings_repository.dart';
+import 'package:reflexive/domain/usecases/reflect_agent_usecase.dart';
+import 'package:reflexive/presentation/bloc/chat_bloc.dart';
 
+/// Service Locator instance from GetIt.
 final sl = GetIt.instance;
 
+/// Initializes all dependencies for the application.
+/// 
+/// This includes BLoCs, Use Cases, Repositories, and External libraries.
 Future<void> init() async {
   // BLoC
   sl.registerFactory(

@@ -1,13 +1,20 @@
 import 'package:dio/dio.dart';
-import '../../domain/entities/chat_message.dart';
-import '../../domain/repositories/llm_repository.dart';
+import 'package:reflexive/domain/entities/chat_message.dart';
+import 'package:reflexive/domain/repositories/llm_repository.dart';
 
+/// Implementation of [LlmRepository] using the Dio HTTP client.
 class DioLlmRepository implements LlmRepository {
   final Dio _dio;
   final String _apiKey;
   final String _baseUrl;
   final String _model;
 
+  /// Creates a new instance of [DioLlmRepository].
+  ///
+  /// [_dio] is the HTTP client.
+  /// [_apiKey] is the API key for authentication.
+  /// [_baseUrl] is the base URL of the LLM provider API.
+  /// [_model] is the name of the model to use.
   DioLlmRepository({
     required Dio dio,
     required String apiKey,
