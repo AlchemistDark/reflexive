@@ -30,9 +30,7 @@ Future<void> init() async {
   sl.registerLazySingleton<LlmRepository>(
     () => DioLlmRepository(
       dio: sl(),
-      apiKey: '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',
-      baseUrl: 'https://openrouter.ai/api/v1',
-      model: 'openrouter/auto',
+      settingsRepository: sl(),
     ),
   );
 

@@ -14,13 +14,10 @@ class SendUserMessage extends ChatEvent {
   /// The text content of the user's query.
   final String text;
 
-  /// The time preset selected for the reflection process.
-  final TimePreset timePreset;
-
-  const SendUserMessage(this.text, this.timePreset);
+  const SendUserMessage(this.text);
 
   @override
-  List<Object?> get props => [text, timePreset];
+  List<Object?> get props => [text];
 }
 
 /// Event triggered to cancel the ongoing reflection process.

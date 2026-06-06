@@ -17,11 +17,13 @@ class ReflectAgentUseCase {
   /// Returns a [Stream] of [ReflectionStep] containing intermediate results.
   /// [timePreset] defines the constraints (duration and iterations).
   /// [mode] defines the strategy used by the Critic agent.
+  /// [stopOnNoIssues] if true, the process stops when the Critic returns "NO_ISSUES".
   /// [cancelToken] can be used to abort the process.
   Stream<ReflectionStep> execute({
     required String query,
     required TimePreset timePreset,
     ReflectionMode mode = ReflectionMode.standard,
+    bool stopOnNoIssues = true,
     Object? cancelToken,
   }) async* {
     final stopwatch = Stopwatch()..start();
@@ -76,7 +78,7 @@ class ReflectAgentUseCase {
         role: AgentRole.critic,
       );
 
-      if (critique.trim().toUpperCase().contains("NO_ISSUES")) break;
+      if (stopOnNoIssues && critique.trim().toUpperCase().contains("NO_ISSUES")) break;
 
       // 3. Generation of improved answer
       final improved = await llmRepository.generate(

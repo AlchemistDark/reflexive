@@ -1,29 +1,22 @@
 import 'package:dio/dio.dart';
 import 'package:reflexive/domain/entities/chat_message.dart';
 import 'package:reflexive/domain/repositories/llm_repository.dart';
+import 'package:reflexive/domain/repositories/settings_repository.dart';
 
 /// Implementation of [LlmRepository] using the Dio HTTP client.
 class DioLlmRepository implements LlmRepository {
   final Dio _dio;
-  final String _apiKey;
-  final String _baseUrl;
-  final String _model;
+  final SettingsRepository _settingsRepository;
 
   /// Creates a new instance of [DioLlmRepository].
   ///
   /// [_dio] is the HTTP client.
-  /// [_apiKey] is the API key for authentication.
-  /// [_baseUrl] is the base URL of the LLM provider API.
-  /// [_model] is the name of the model to use.
+  /// [_settingsRepository] is used to retrieve current API configuration.
   DioLlmRepository({
     required Dio dio,
-    required String apiKey,
-    String baseUrl = 'https://api.deepseek.com/v1',
-    String model = 'deepseek-chat',
+    required SettingsRepository settingsRepository,
   })  : _dio = dio,
-        _apiKey = apiKey,
-        _baseUrl = baseUrl,
-        _model = model;
+        _settingsRepository = settingsRepository;
 
   @override
   Future<String> generate({
@@ -31,11 +24,15 @@ class DioLlmRepository implements LlmRepository {
     required List<ChatMessage> messages,
     Object? cancelToken,
   }) async {
+    final baseUrl = _settingsRepository.getBaseUrl();
+    final apiKey = _settingsRepository.getApiKey();
+    final model = _settingsRepository.getModelName();
+
     try {
       final response = await _dio.post(
-        '$_baseUrl/chat/completions',
+        '$baseUrl/chat/completions',
         data: {
-          'model': _model,
+          'model': model,
           'messages': [
             {'role': 'system', 'content': systemPrompt},
             ...messages.map((m) => {'role': m.role, 'content': m.content}),
@@ -44,7 +41,7 @@ class DioLlmRepository implements LlmRepository {
         },
         options: Options(
           headers: {
-            'Authorization': 'Bearer $_apiKey',
+            'Authorization': 'Bearer $apiKey',
             'Content-Type': 'application/json',
           },
         ),
@@ -55,6 +52,9 @@ class DioLlmRepository implements LlmRepository {
     } on DioException catch (e) {
       if (CancelToken.isCancel(e)) {
         throw Exception('Запрос отменен пользователем');
+      }
+      if (e.response?.statusCode == 401) {
+        throw Exception('Ошибка API: 401 Unauthorized. Проверьте ваш API ключ в настройках.');
       }
       throw Exception('Ошибка API: ${e.message}');
     } catch (e) {

@@ -39,13 +39,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // Read settings from the repository
     final maxDurationSeconds = _settingsRepository.getMaxDuration();
+    final maxIterations = _settingsRepository.getMaxIterations();
+    final stopOnNoIssues = _settingsRepository.getStopOnNoIssues();
     final reflectionMode = _settingsRepository.getReflectionMode();
 
     // Create a custom preset based on user settings
     final effectivePreset = TimePreset(
       name: "Custom",
       maxDuration: Duration(seconds: maxDurationSeconds),
-      maxIterations: event.timePreset.maxIterations,
+      maxIterations: maxIterations,
     );
 
     emit(ChatReflecting(
@@ -60,6 +62,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           query: event.text,
           timePreset: effectivePreset,
           mode: reflectionMode,
+          stopOnNoIssues: stopOnNoIssues,
           cancelToken: _cancelToken,
         ),
         onData: (step) {
@@ -96,7 +99,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           reason = StoppedReason.timeout;
         } else if (reflectingState.lastUpdate?.contains('NO_ISSUES') == true) {
           reason = StoppedReason.noIssues;
-        } else if (reflectingState.currentIteration >= event.timePreset.maxIterations) {
+        } else if (reflectingState.currentIteration >= maxIterations) {
           reason = StoppedReason.maxIterations;
         }
 

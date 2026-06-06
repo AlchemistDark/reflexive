@@ -6,7 +6,12 @@ import 'package:reflexive/domain/repositories/settings_repository.dart';
 class SharedPrefsSettingsRepository implements SettingsRepository {
   final SharedPreferences _prefs;
   static const _keyMaxDuration = 'max_duration';
+  static const _keyMaxIterations = 'max_iterations';
+  static const _keyStopOnNoIssues = 'stop_on_no_issues';
   static const _keyReflectionMode = 'reflection_mode';
+  static const _keyApiKey = 'api_key';
+  static const _keyModelName = 'model_name';
+  static const _keyBaseUrl = 'base_url';
 
   /// Creates a new instance of [SharedPrefsSettingsRepository].
   SharedPrefsSettingsRepository(this._prefs);
@@ -22,6 +27,26 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
   }
 
   @override
+  int getMaxIterations() {
+    return _prefs.getInt(_keyMaxIterations) ?? 5; // Default 5 iterations
+  }
+
+  @override
+  Future<void> setMaxIterations(int count) async {
+    await _prefs.setInt(_keyMaxIterations, count);
+  }
+
+  @override
+  bool getStopOnNoIssues() {
+    return _prefs.getBool(_keyStopOnNoIssues) ?? true; // Default true
+  }
+
+  @override
+  Future<void> setStopOnNoIssues(bool stop) async {
+    await _prefs.setBool(_keyStopOnNoIssues, stop);
+  }
+
+  @override
   ReflectionMode getReflectionMode() {
     final index = _prefs.getInt(_keyReflectionMode);
     if (index == null || index >= ReflectionMode.values.length) {
@@ -33,5 +58,35 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
   @override
   Future<void> setReflectionMode(ReflectionMode mode) async {
     await _prefs.setInt(_keyReflectionMode, mode.index);
+  }
+
+  @override
+  String getApiKey() {
+    return _prefs.getString(_keyApiKey) ?? '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';
+  }
+
+  @override
+  Future<void> setApiKey(String apiKey) async {
+    await _prefs.setString(_keyApiKey, apiKey);
+  }
+
+  @override
+  String getModelName() {
+    return _prefs.getString(_keyModelName) ?? 'openrouter/auto';
+  }
+
+  @override
+  Future<void> setModelName(String modelName) async {
+    await _prefs.setString(_keyModelName, modelName);
+  }
+
+  @override
+  String getBaseUrl() {
+    return _prefs.getString(_keyBaseUrl) ?? 'https://openrouter.ai/api/v1';
+  }
+
+  @override
+  Future<void> setBaseUrl(String baseUrl) async {
+    await _prefs.setString(_keyBaseUrl, baseUrl);
   }
 }

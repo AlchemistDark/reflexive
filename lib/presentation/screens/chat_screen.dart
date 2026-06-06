@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reflexive/domain/entities/time_preset.dart';
 import 'package:reflexive/presentation/bloc/chat_bloc.dart';
 import 'package:reflexive/presentation/bloc/chat_event.dart';
 import 'package:reflexive/presentation/bloc/chat_state.dart';
@@ -20,7 +19,6 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
-  TimePreset _selectedPreset = TimePreset.normal;
 
   @override
   void dispose() {
@@ -32,7 +30,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void _sendMessage(BuildContext context) {
     if (_controller.text.trim().isEmpty) return;
     context.read<ChatBloc>().add(
-          SendUserMessage(_controller.text.trim(), _selectedPreset),
+          SendUserMessage(_controller.text.trim()),
         );
     _controller.clear();
   }
@@ -52,21 +50,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   MaterialPageRoute(builder: (_) => const SettingsScreen()),
                 );
               },
-            ),
-            PopupMenuButton<TimePreset>(
-              initialValue: _selectedPreset,
-              onSelected: (preset) {
-                setState(() => _selectedPreset = preset);
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(value: TimePreset.fast, child: Text('Fast')),
-                const PopupMenuItem(value: TimePreset.normal, child: Text('Normal')),
-                const PopupMenuItem(value: TimePreset.deep, child: Text('Deep')),
-              ],
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Center(child: Text(_selectedPreset.name)),
-              ),
             ),
           ],
         ),
