@@ -1,0 +1,1 @@
+enum AgentRole { generator, critic }
