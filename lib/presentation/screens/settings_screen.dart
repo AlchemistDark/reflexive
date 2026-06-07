@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:reflexive/core/di/injection_container.dart';
 import 'package:reflexive/domain/entities/reflection_mode.dart';
+import 'package:reflexive/domain/entities/llm_provider.dart';
 import 'package:reflexive/domain/repositories/settings_repository.dart';
 
 /// Screen for managing application settings like response duration and reflection mode.
@@ -25,6 +26,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// The currently selected reflection mode.
   late ReflectionMode _reflectionMode;
 
+  /// The currently selected LLM provider.
+  late LlmProvider _llmProvider;
+
   /// Whether to stop if no issues are found.
   late bool _stopOnNoIssues;
 
@@ -47,6 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       text: _settingsRepository.getBaseUrl(),
     );
     _reflectionMode = _settingsRepository.getReflectionMode();
+    _llmProvider = _settingsRepository.getLlmProvider();
     _stopOnNoIssues = _settingsRepository.getStopOnNoIssues();
   }
 
@@ -98,6 +103,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _reflectionMode = mode;
     });
     _settingsRepository.setReflectionMode(mode);
+  }
+
+  /// Updates and persists the LLM provider.
+  void _saveProvider(LlmProvider? provider) {
+    if (provider == null) return;
+    setState(() {
+      _llmProvider = provider;
+      if (provider != LlmProvider.custom) {
+        _baseUrlController.text = provider.defaultBaseUrl;
+        _modelController.text = provider.defaultModel;
+        _settingsRepository.setBaseUrl(provider.defaultBaseUrl);
+        _settingsRepository.setModelName(provider.defaultModel);
+      }
+    });
+    _settingsRepository.setLlmProvider(provider);
   }
 
   /// Updates and persists the "Stop on no issues" setting.
@@ -178,6 +198,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const Divider(),
           const SizedBox(height: 8),
+          DropdownButtonFormField<LlmProvider>(
+            value: _llmProvider,
+            decoration: const InputDecoration(
+              labelText: 'Provider',
+              border: OutlineInputBorder(),
+            ),
+            items: LlmProvider.values.map((provider) {
+              return DropdownMenuItem(
+                value: provider,
+                child: Text(provider.displayName),
+              );
+            }).toList(),
+            onChanged: _saveProvider,
+          ),
+          const SizedBox(height: 16),
           TextField(
             controller: _apiKeyController,
             decoration: const InputDecoration(

@@ -1,4 +1,5 @@
 import 'package:reflexive/domain/entities/reflection_mode.dart';
+import 'package:reflexive/domain/entities/llm_provider.dart';
 
 /// Repository interface for managing application settings.
 abstract class SettingsRepository {
@@ -43,4 +44,10 @@ abstract class SettingsRepository {
 
   /// Retrieves the saved base URL.
   String getBaseUrl();
+
+  /// Persists the selected LLM provider.
+  Future<void> setLlmProvider(LlmProvider provider);
+
+  /// Retrieves the currently selected LLM provider.
+  LlmProvider getLlmProvider();
 }

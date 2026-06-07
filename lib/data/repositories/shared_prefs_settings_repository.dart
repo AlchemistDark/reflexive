@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:reflexive/domain/entities/reflection_mode.dart';
+import 'package:reflexive/domain/entities/llm_provider.dart';
 import 'package:reflexive/domain/repositories/settings_repository.dart';
 
 /// Implementation of [SettingsRepository] using [SharedPreferences] for persistent storage.
@@ -12,6 +13,7 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
   static const _keyApiKey = 'api_key';
   static const _keyModelName = 'model_name';
   static const _keyBaseUrl = 'base_url';
+  static const _keyLlmProvider = 'llm_provider';
 
   /// Creates a new instance of [SharedPrefsSettingsRepository].
   SharedPrefsSettingsRepository(this._prefs);
@@ -88,5 +90,19 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
   @override
   Future<void> setBaseUrl(String baseUrl) async {
     await _prefs.setString(_keyBaseUrl, baseUrl);
+  }
+
+  @override
+  LlmProvider getLlmProvider() {
+    final index = _prefs.getInt(_keyLlmProvider);
+    if (index == null || index >= LlmProvider.values.length) {
+      return LlmProvider.openRouter;
+    }
+    return LlmProvider.values[index];
+  }
+
+  @override
+  Future<void> setLlmProvider(LlmProvider provider) async {
+    await _prefs.setInt(_keyLlmProvider, provider.index);
   }
 }
