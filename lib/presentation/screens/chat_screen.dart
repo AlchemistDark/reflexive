@@ -57,27 +57,29 @@ class _ChatScreenState extends State<ChatScreen> {
           return Column(
             children: [
               Expanded(
-                child: BlocBuilder<ChatBloc, ChatState>(
-                  builder: (context, state) {
-                    if (state is ChatInitial) {
-                      return const Center(child: Text('Enter your query to begin'));
-                    }
-                    if (state is ChatReflecting) {
-                      return ReflectionView(state: state);
-                    }
-                    if (state is ChatResponseReady) {
-                      return ResponseView(answer: state.answer);
-                    }
-                    if (state is ChatError) {
-                      return Center(
-                        child: Text(
-                          'Error: ${state.message}',
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
+                child: SelectionArea(
+                  child: BlocBuilder<ChatBloc, ChatState>(
+                    builder: (context, state) {
+                      if (state is ChatInitial) {
+                        return const Center(child: Text('Enter your query to begin'));
+                      }
+                      if (state is ChatReflecting) {
+                        return ReflectionView(state: state);
+                      }
+                      if (state is ChatResponseReady) {
+                        return ResponseView(answer: state.answer);
+                      }
+                      if (state is ChatError) {
+                        return Center(
+                          child: Text(
+                            'Error: ${state.message}',
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ),
               ),
               ChatInputArea(

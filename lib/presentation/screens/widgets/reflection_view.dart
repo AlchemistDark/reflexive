@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:reflexive/domain/entities/agent_role.dart';
 import 'package:reflexive/presentation/bloc/chat_state.dart';
+import 'package:reflexive/presentation/screens/widgets/code_highlighter_builder.dart';
+import 'package:reflexive/presentation/screens/widgets/math_builder.dart';
 
 /// A widget that displays the ongoing reflection process.
 class ReflectionView extends StatelessWidget {
@@ -42,7 +44,15 @@ class ReflectionView extends StatelessWidget {
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: MarkdownBody(data: state.lastUpdate!),
+              child: MarkdownBody(
+                data: state.lastUpdate!,
+                builders: {
+                  'code': CodeHighlighterBuilder(),
+                  'latex': MathBuilder(),
+                },
+                inlineSyntaxes: LaTeXSettings.inlineSyntaxes,
+                blockSyntaxes: LaTeXSettings.blockSyntaxes,
+              ),
             ),
           ],
         ],

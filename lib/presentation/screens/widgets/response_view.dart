@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:reflexive/domain/entities/agent_role.dart';
 import 'package:reflexive/domain/entities/final_answer.dart';
+import 'package:reflexive/presentation/screens/widgets/code_highlighter_builder.dart';
+import 'package:reflexive/presentation/screens/widgets/math_builder.dart';
 
 /// A widget that displays the final answer and the reflection logs.
 class ResponseView extends StatelessWidget {
@@ -24,7 +26,12 @@ class ResponseView extends StatelessWidget {
           const SizedBox(height: 8),
           MarkdownBody(
             data: answer.text,
-            selectable: true,
+            builders: {
+              'code': CodeHighlighterBuilder(),
+              'latex': MathBuilder(),
+            },
+            inlineSyntaxes: LaTeXSettings.inlineSyntaxes,
+            blockSyntaxes: LaTeXSettings.blockSyntaxes,
           ),
           const SizedBox(height: 24),
           ExpansionTile(
@@ -35,7 +42,15 @@ class ResponseView extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: MarkdownBody(data: step.content),
+                    child: MarkdownBody(
+                      data: step.content,
+                      builders: {
+                        'code': CodeHighlighterBuilder(),
+                        'latex': MathBuilder(),
+                      },
+                      inlineSyntaxes: LaTeXSettings.inlineSyntaxes,
+                      blockSyntaxes: LaTeXSettings.blockSyntaxes,
+                    ),
                   ),
                 ],
               );
