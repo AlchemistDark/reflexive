@@ -10,24 +10,30 @@ class MathBuilder extends MarkdownElementBuilder {
     final text = element.textContent.trim();
     if (text.isEmpty) return null;
 
+    final bool isDisplay = element.attributes['display'] == 'true';
+
+    final mathWidget = Math.tex(
+      text,
+      textStyle: preferredStyle?.copyWith(
+        fontSize: isDisplay ? 17 : (preferredStyle.fontSize ?? 14),
+        color: preferredStyle.color ?? Colors.black87,
+      ),
+      mathStyle: isDisplay ? MathStyle.display : MathStyle.text,
+      onErrorFallback: (err) => Text(
+        text,
+        style: const TextStyle(color: Colors.red),
+      ),
+    );
+
+    if (!isDisplay) return mathWidget;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: Math.tex(
-            text,
-            textStyle: preferredStyle?.copyWith(
-              fontSize: 17,
-              color: preferredStyle.color ?? Colors.black87,
-            ),
-            mathStyle: MathStyle.display,
-            onErrorFallback: (err) => Text(
-              text,
-              style: const TextStyle(color: Colors.red),
-            ),
-          ),
+          child: mathWidget,
         ),
       ),
     );
@@ -42,9 +48,9 @@ class LaTeXSettings {
         // Inline math: \(...\)
         MathSyntax(r'\\\(((?:\\.|[^\)])+)\\\)'),
         // Block math as inline: \[...\]
-        MathSyntax(r'\\\[((?:\\.|[^\]])+)\\\]'),
+        MathSyntax(r'\\\[((?:\\.|[^\]])+)\\\]', display: true),
         // Block math as inline: $$...$$
-        MathSyntax(r'\$\$((?:\\.|[^\$])+)\$\$'),
+        MathSyntax(r'\$\$((?:\\.|[^\$])+)\$\$', display: true),
       ];
 
   static List<md.BlockSyntax> get blockSyntaxes => [
@@ -53,13 +59,17 @@ class LaTeXSettings {
 }
 
 class MathSyntax extends md.InlineSyntax {
-  MathSyntax(String pattern) : super(pattern);
+  final bool display;
+  MathSyntax(super.pattern, {this.display = false});
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
-    // Content is in the last capturing group
     final formula = match.group(match.groupCount) ?? '';
-    parser.addNode(md.Element('latex', [md.Text(formula.trim())]));
+    final element = md.Element('latex', [md.Text(formula.trim())]);
+    if (display) {
+      element.attributes['display'] = 'true';
+    }
+    parser.addNode(element);
     return true;
   }
 }
@@ -79,7 +89,11 @@ class MathBlockSyntax extends md.BlockSyntax {
     final oneLineMatch = RegExp(r'^(\$\$|\\\[)(.*?)(\$\$|\\\])$').firstMatch(firstLine.trim());
     if (oneLineMatch != null) {
       parser.advance();
-      return md.Element('latex', [md.Text(oneLineMatch.group(2)!.trim())]);
+      // Wrapping in 'p' prevents the "Null check operator" crash in flutter_markdown
+      return md.Element('p', [
+        md.Element('latex', [md.Text(oneLineMatch.group(2)!.trim())])
+          ..attributes['display'] = 'true'
+      ]);
     }
 
     // 2. Multi-line block
@@ -88,8 +102,11 @@ class MathBlockSyntax extends md.BlockSyntax {
     
     // Extract content from the first line (after delimiter)
     var firstLineContent = firstLine.trim();
-    if (firstLineContent.startsWith(r'$$')) firstLineContent = firstLineContent.substring(2);
-    else if (firstLineContent.startsWith(r'\[')) firstLineContent = firstLineContent.substring(2);
+    if (firstLineContent.startsWith(r'$$')) {
+      firstLineContent = firstLineContent.substring(2);
+    } else if (firstLineContent.startsWith(r'\[')) {
+      firstLineContent = firstLineContent.substring(2);
+    }
     
     if (firstLineContent.isNotEmpty) lines.add(firstLineContent);
     
@@ -107,6 +124,9 @@ class MathBlockSyntax extends md.BlockSyntax {
       parser.advance();
     }
     
-    return md.Element('latex', [md.Text(lines.join('\n').trim())]);
+    return md.Element('p', [
+      md.Element('latex', [md.Text(lines.join('\n').trim())])
+        ..attributes['display'] = 'true'
+    ]);
   }
 }
