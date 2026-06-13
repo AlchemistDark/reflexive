@@ -31,11 +31,13 @@ class ChatInputArea extends StatelessWidget {
                 child: TextField(
                   controller: controller,
                   enabled: !isReflecting,
+                  maxLines: 5,
+                  minLines: 1,
+                  keyboardType: TextInputType.multiline,
                   decoration: const InputDecoration(
                     hintText: 'Ask a question...',
                     border: OutlineInputBorder(),
                   ),
-                  onSubmitted: (_) => isReflecting ? null : onSend(),
                 ),
               ),
               const SizedBox(width: 8),
