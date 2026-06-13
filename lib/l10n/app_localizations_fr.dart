@@ -138,4 +138,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get importError =>
       'Échec de l\'importation des prompts : Format invalide';
+
+  @override
+  String get useInternet => 'Enable Internet Search';
+
+  @override
+  String get useInternetSubtitle =>
+      'Allow the model to access the web for up-to-date information (if supported by provider)';
 }

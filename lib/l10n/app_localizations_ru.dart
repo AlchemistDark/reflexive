@@ -137,4 +137,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get importError => 'Ошибка импорта: Неверный формат';
+
+  @override
+  String get useInternet => 'Включить поиск в интернете';
+
+  @override
+  String get useInternetSubtitle =>
+      'Разрешить модели использовать веб для получения актуальной информации (если поддерживается провайдером)';
 }

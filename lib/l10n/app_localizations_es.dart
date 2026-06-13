@@ -138,4 +138,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get importError => 'Error al importar prompts: Formato no válido';
+
+  @override
+  String get useInternet => 'Habilitar búsqueda en Internet';
+
+  @override
+  String get useInternetSubtitle =>
+      'Permite que el modelo acceda a la web para obtener información actualizada (si el proveedor lo admite)';
 }

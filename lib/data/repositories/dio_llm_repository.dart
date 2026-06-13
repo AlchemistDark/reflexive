@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:reflexive/domain/entities/chat_message.dart';
+import 'package:reflexive/domain/entities/llm_provider.dart';
 import 'package:reflexive/domain/repositories/llm_repository.dart';
 import 'package:reflexive/domain/repositories/settings_repository.dart';
 
@@ -45,17 +46,40 @@ class DioLlmRepository implements LlmRepository {
     
     final fullUrl = '$cleanBaseUrl/chat/completions';
 
+    final Map<String, dynamic> requestBody = {
+      'model': cleanModel,
+      'messages': [
+        {'role': 'system', 'content': systemPrompt},
+        ...messages.map((m) => {'role': m.role, 'content': m.content}),
+      ],
+      'temperature': 0.7,
+    };
+
+    if (_settingsRepository.getUseInternet()) {
+      // For OpenRouter and some other providers, web search can be enabled via extra parameters
+      if (provider == LlmProvider.openRouter) {
+        requestBody['plugins'] = [
+          {'id': 'web_search'}
+        ];
+      } else if (provider == LlmProvider.google) {
+        // Google AI Studio OpenAI-compatible endpoint tool support for search
+        requestBody['tools'] = [
+          {
+            'google_search_retrieval': {
+              'dynamic_retrieval_config': {
+                'mode': 'MODE_DYNAMIC',
+                'dynamic_threshold': 0.3,
+              }
+            }
+          }
+        ];
+      }
+    }
+
     try {
       final response = await _dio.post(
         fullUrl,
-        data: {
-          'model': cleanModel,
-          'messages': [
-            {'role': 'system', 'content': systemPrompt},
-            ...messages.map((m) => {'role': m.role, 'content': m.content}),
-          ],
-          'temperature': 0.7,
-        },
+        data: requestBody,
         options: Options(
           headers: {
             'Authorization': 'Bearer $apiKey',

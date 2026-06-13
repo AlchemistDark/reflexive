@@ -4,7 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:reflexive/core/di/injection_container.dart' as di;
 import 'package:reflexive/presentation/bloc/chat_bloc.dart';
 import 'package:reflexive/presentation/screens/chat_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reflexive/l10n/app_localizations.dart';
 
 /// The entry point of the Reflexive Agent application.
 void main() async {

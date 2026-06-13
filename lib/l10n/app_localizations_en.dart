@@ -137,4 +137,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importError => 'Failed to import prompts: Invalid format';
+
+  @override
+  String get useInternet => 'Enable Internet Search';
+
+  @override
+  String get useInternetSubtitle =>
+      'Allow the model to access the web for up-to-date information (if supported by provider)';
 }

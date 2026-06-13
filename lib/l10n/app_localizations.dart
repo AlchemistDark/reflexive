@@ -355,6 +355,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to import prompts: Invalid format'**
   String get importError;
+
+  /// No description provided for @useInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Internet Search'**
+  String get useInternet;
+
+  /// No description provided for @useInternetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow the model to access the web for up-to-date information (if supported by provider)'**
+  String get useInternetSubtitle;
 }
 
 class _AppLocalizationsDelegate

@@ -39,5 +39,7 @@
   "importPrompts": "Importar prompts",
   "exportSuccess": "Prompts exportados al portapapeles",
   "importSuccess": "Prompts importados con éxito",
-  "importError": "Error al importar prompts: Formato no válido"
+  "importError": "Error al importar prompts: Formato no válido",
+  "useInternet": "Habilitar búsqueda en Internet",
+  "useInternetSubtitle": "Permite que el modelo acceda a la web para obtener información actualizada (si el proveedor lo admite)"
 }

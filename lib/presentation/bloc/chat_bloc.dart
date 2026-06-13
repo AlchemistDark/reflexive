@@ -51,6 +51,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final criticPrompt = _settingsRepository.getCriticPrompt();
     final devilsAdvocatePrompt = _settingsRepository.getDevilsAdvocatePrompt();
     final editorPrompt = _settingsRepository.getEditorPrompt();
+    final useInternet = _settingsRepository.getUseInternet();
 
     // Create a custom preset based on user settings
     final effectivePreset = TimePreset(
@@ -80,6 +81,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           criticPrompt: criticPrompt,
           devilsAdvocatePrompt: devilsAdvocatePrompt,
           editorPrompt: editorPrompt,
+          useInternet: useInternet,
         ),
         onData: (step) {
           final internalStep = InternalStep(

@@ -4,7 +4,7 @@ import 'package:reflexive/domain/entities/agent_role.dart';
 import 'package:reflexive/presentation/bloc/chat_state.dart';
 import 'package:reflexive/presentation/screens/widgets/code_highlighter_builder.dart';
 import 'package:reflexive/presentation/screens/widgets/math_builder.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reflexive/l10n/app_localizations.dart';
 
 /// A widget that displays the ongoing reflection process.
 class ReflectionView extends StatelessWidget {

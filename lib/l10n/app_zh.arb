@@ -39,5 +39,7 @@
   "importPrompts": "导入提示词",
   "exportSuccess": "提示词已复制到剪贴板",
   "importSuccess": "提示词导入成功",
-  "importError": "导入失败：格式无效"
+  "importError": "导入失败：格式无效",
+  "useInternet": "启用网络搜索",
+  "useInternetSubtitle": "允许模型访问网络以获取最新信息（如果提供商支持）"
 }

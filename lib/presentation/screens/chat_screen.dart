@@ -8,7 +8,7 @@ import 'package:reflexive/core/di/injection_container.dart';
 import 'package:reflexive/presentation/screens/widgets/chat_input_area.dart';
 import 'package:reflexive/presentation/screens/widgets/reflection_view.dart';
 import 'package:reflexive/presentation/screens/widgets/response_view.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reflexive/l10n/app_localizations.dart';
 
 /// The main chat screen where users interact with the Reflexive Agent.
 class ChatScreen extends StatefulWidget {

@@ -135,4 +135,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get importError => '読み込みに失敗しました：無効な形式です';
+
+  @override
+  String get useInternet => 'インターネット検索を有効にする';
+
+  @override
+  String get useInternetSubtitle =>
+      'プロバイダーがサポートしている場合、最新情報を取得するためにモデルがウェブにアクセスすることを許可します';
 }

@@ -134,4 +134,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get importError => '导入失败：格式无效';
+
+  @override
+  String get useInternet => '启用网络搜索';
+
+  @override
+  String get useInternetSubtitle => '允许模型访问网络以获取最新信息（如果提供商支持）';
 }

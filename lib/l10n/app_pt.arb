@@ -34,5 +34,12 @@
   "devilsAdvocateRole": "Papel de Advogado do Diabo",
   "devilsAdvocateRoleHelper": "Prompt para crítica agressiva",
   "editorRole": "Papel do Editor",
-  "editorRoleHelper": "Prompt para a fase final de polimento"
+  "editorRoleHelper": "Prompt para a fase final de polimento",
+  "exportPrompts": "Exportar prompts",
+  "importPrompts": "Importar prompts",
+  "exportSuccess": "Prompts exportados para a área de transferência",
+  "importSuccess": "Prompts importados com sucesso",
+  "importError": "Falha ao importar prompts: Formato inválido",
+  "useInternet": "Habilitar pesquisa na Internet",
+  "useInternetSubtitle": "Permitir que o modelo acesse a web para informações atualizadas (se suportado pelo provedor)"
 }

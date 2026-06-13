@@ -4,7 +4,7 @@ import 'package:reflexive/core/di/injection_container.dart';
 import 'package:reflexive/domain/entities/reflection_mode.dart';
 import 'package:reflexive/domain/entities/llm_provider.dart';
 import 'package:reflexive/domain/repositories/settings_repository.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reflexive/l10n/app_localizations.dart';
 
 /// Screen for managing application settings like response duration and reflection mode.
 class SettingsScreen extends StatefulWidget {
@@ -42,6 +42,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   /// Whether to stop if no issues are found.
   late bool _stopOnNoIssues;
+
+  /// Whether to use internet search.
+  late bool _useInternet;
 
   @override
   void initState() {
@@ -88,6 +91,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _reflectionMode = _settingsRepository.getReflectionMode();
     _llmProvider = _settingsRepository.getLlmProvider();
     _stopOnNoIssues = _settingsRepository.getStopOnNoIssues();
+    _useInternet = _settingsRepository.getUseInternet();
   }
 
   @override
@@ -168,6 +172,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _stopOnNoIssues = value;
     });
     _settingsRepository.setStopOnNoIssues(value);
+  }
+
+  /// Updates and persists the "Use Internet" setting.
+  void _saveUseInternet(bool value) {
+    setState(() {
+      _useInternet = value;
+    });
+    _settingsRepository.setUseInternet(value);
   }
 
   /// Saves the request delay from the text field.
@@ -264,6 +276,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           subtitle: Text(l10n.stopIfNoIssuesSubtitle),
           value: _stopOnNoIssues,
           onChanged: _saveStopOnNoIssues,
+        ),
+        SwitchListTile(
+          title: Text(l10n.useInternet),
+          subtitle: Text(l10n.useInternetSubtitle),
+          value: _useInternet,
+          onChanged: _saveUseInternet,
         ),
         const SizedBox(height: 24),
         Text(

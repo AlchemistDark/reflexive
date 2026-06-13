@@ -20,6 +20,10 @@ class ReflectAgentUseCase {
       "Your goal is self-improvement through iterative analysis. You are responsible for both creating the content and identifying your own mistakes to ensure the final output is flawless. "
       "The process follows these stages: GENERATION -> CRITIQUE -> IMPROVEMENT. ";
 
+  /// Instruction to encourage internet search usage.
+  static const _internetPrompt =
+      " You have access to internet search tools. Use them proactively to verify facts, cite sources, and ensure your information is up-to-date.";
+
   ReflectAgentUseCase({required this.llmRepository});
 
   /// Executes the reflection loop for a given [query].
@@ -43,11 +47,15 @@ class ReflectAgentUseCase {
     String? criticPrompt,
     String? devilsAdvocatePrompt,
     String? editorPrompt,
+    bool useInternet = false,
   }) async* {
     final stopwatch = Stopwatch()..start();
     final timeBudget = timePreset.maxDuration.inMilliseconds;
 
-    final architecture = systemArchitecture ?? _systemArchitecture;
+    String architecture = systemArchitecture ?? _systemArchitecture;
+    if (useInternet) {
+      architecture += _internetPrompt;
+    }
     final math = mathPrompt ?? _mathPrompt;
 
     // 1. Initial generation

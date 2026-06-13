@@ -22,6 +22,7 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
   static const _keyCriticPrompt = 'critic_prompt';
   static const _keyDevilsAdvocatePrompt = 'devils_advocate_prompt';
   static const _keyEditorPrompt = 'editor_prompt';
+  static const _keyUseInternet = 'use_internet';
 
   // Default Prompts
   static const defaultSystemArchitecture = "You are the central intelligence of the 'Reflexive Agent'. You perform a multi-role reflection process where you sequentially act as Generator, Critic, and Editor. Your goal is self-improvement through iterative analysis. You are responsible for both creating the content and identifying your own mistakes to ensure the final output is flawless. The process follows these stages: GENERATION -> CRITIQUE -> IMPROVEMENT. ";
@@ -225,6 +226,16 @@ class SharedPrefsSettingsRepository implements SettingsRepository {
   @override
   Future<void> resetDevilsAdvocatePrompt() async {
     await _prefs.remove(_keyDevilsAdvocatePrompt);
+  }
+
+  @override
+  bool getUseInternet() {
+    return _prefs.getBool(_keyUseInternet) ?? false;
+  }
+
+  @override
+  Future<void> setUseInternet(bool enabled) async {
+    await _prefs.setBool(_keyUseInternet, enabled);
   }
 
   @override

@@ -124,17 +124,24 @@ class AppLocalizationsHi extends AppLocalizations {
   String get editorRoleHelper => 'अंतिम पॉलिशिंग चरण के लिए प्रॉम्ट';
 
   @override
-  String get exportPrompts => 'Export Prompts';
+  String get exportPrompts => 'प्रॉम्प्ट निर्यात करें';
 
   @override
-  String get importPrompts => 'Import Prompts';
+  String get importPrompts => 'प्रॉम्प्ट आयात करें';
 
   @override
-  String get exportSuccess => 'Prompts exported to clipboard';
+  String get exportSuccess => 'प्रॉम्प्ट क्लिपबोर्ड पर निर्यात किए गए';
 
   @override
-  String get importSuccess => 'Prompts imported successfully';
+  String get importSuccess => 'प्रॉम्प्ट सफलतापूर्वक आयात किए गए';
 
   @override
-  String get importError => 'Failed to import prompts: Invalid format';
+  String get importError => 'प्रॉम्प्ट आयात करने में विफल: अमान्य प्रारूप';
+
+  @override
+  String get useInternet => 'इंटरनेट खोज सक्षम करें';
+
+  @override
+  String get useInternetSubtitle =>
+      'मॉडल को अद्यतित जानकारी के लिए वेब तक पहुँचने की अनुमति दें (यदि प्रदाता द्वारा समर्थित हो)';
 }

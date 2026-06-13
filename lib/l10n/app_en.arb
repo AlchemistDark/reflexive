@@ -53,5 +53,7 @@
   "importPrompts": "Import Prompts",
   "exportSuccess": "Prompts exported to clipboard",
   "importSuccess": "Prompts imported successfully",
-  "importError": "Failed to import prompts: Invalid format"
+  "importError": "Failed to import prompts: Invalid format",
+  "useInternet": "Enable Internet Search",
+  "useInternetSubtitle": "Allow the model to access the web for up-to-date information (if supported by provider)"
 }

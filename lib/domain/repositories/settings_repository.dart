@@ -109,4 +109,10 @@ abstract class SettingsRepository {
 
   /// Imports prompt configurations from a JSON string.
   Future<void> importPrompts(String json);
+
+  /// Persists whether internet search is enabled.
+  Future<void> setUseInternet(bool enabled);
+
+  /// Retrieves whether internet search is enabled.
+  bool getUseInternet();
 }

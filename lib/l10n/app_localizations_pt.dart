@@ -124,17 +124,24 @@ class AppLocalizationsPt extends AppLocalizations {
   String get editorRoleHelper => 'Prompt para a fase final de polimento';
 
   @override
-  String get exportPrompts => 'Export Prompts';
+  String get exportPrompts => 'Exportar prompts';
 
   @override
-  String get importPrompts => 'Import Prompts';
+  String get importPrompts => 'Importar prompts';
 
   @override
-  String get exportSuccess => 'Prompts exported to clipboard';
+  String get exportSuccess => 'Prompts exportados para a área de transferência';
 
   @override
-  String get importSuccess => 'Prompts imported successfully';
+  String get importSuccess => 'Prompts importados com sucesso';
 
   @override
-  String get importError => 'Failed to import prompts: Invalid format';
+  String get importError => 'Falha ao importar prompts: Formato inválido';
+
+  @override
+  String get useInternet => 'Habilitar pesquisa na Internet';
+
+  @override
+  String get useInternetSubtitle =>
+      'Permitir que o modelo acesse a web para informações atualizadas (se suportado pelo provedor)';
 }
