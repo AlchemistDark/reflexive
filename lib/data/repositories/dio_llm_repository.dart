@@ -56,24 +56,16 @@ class DioLlmRepository implements LlmRepository {
     };
 
     if (_settingsRepository.getUseInternet()) {
-      // For OpenRouter and some other providers, web search can be enabled via extra parameters
+      // For OpenRouter, web search can be enabled via the 'provider' parameter.
       if (provider == LlmProvider.openRouter) {
-        requestBody['plugins'] = [
-          {'id': 'web_search'}
-        ];
-      } else if (provider == LlmProvider.google) {
-        // Google AI Studio OpenAI-compatible endpoint tool support for search
-        requestBody['tools'] = [
-          {
-            'google_search_retrieval': {
-              'dynamic_retrieval_config': {
-                'mode': 'MODE_DYNAMIC',
-                'dynamic_threshold': 0.3,
-              }
-            }
-          }
-        ];
+        requestBody['provider'] = {
+          'web_search': true,
+        };
       }
+      // Note: Google AI Studio's OpenAI-compatible endpoint (/openai/chat/completions)
+      // currently does not support the 'google_search_retrieval' tool.
+      // Built-in tools are only supported in their native Gemini API.
+      // We rely on the system prompt to nudge the model to use search if available.
     }
 
     try {
