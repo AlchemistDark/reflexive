@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:reflexive/core/di/injection_container.dart' as di;
 import 'package:reflexive/presentation/bloc/chat_bloc.dart';
 import 'package:reflexive/presentation/screens/chat_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// The entry point of the Reflexive Agent application.
 void main() async {
@@ -22,7 +24,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Reflective Agent',
+      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ru'),
+        Locale('zh'),
+        Locale('es'),
+        Locale('fr'),
+        Locale('hi'),
+        Locale('pt'),
+        Locale('ja'),
+      ],
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(

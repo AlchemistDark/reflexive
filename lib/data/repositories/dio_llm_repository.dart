@@ -26,13 +26,30 @@ class DioLlmRepository implements LlmRepository {
   }) async {
     final baseUrl = _settingsRepository.getBaseUrl();
     final apiKey = _settingsRepository.getApiKey();
-    final model = _settingsRepository.getModelName();
+    final provider = _settingsRepository.getLlmProvider();
+    var model = _settingsRepository.getModelName();
+
+    // Support "auto" or "default" keywords
+    if (model.toLowerCase() == 'auto' || model.toLowerCase() == 'default' || model.isEmpty) {
+      model = provider.defaultModel;
+    }
+
+    // Ensure model name does NOT have 'models/' prefix for OpenAI-compatible endpoint
+    // even if the user manually typed it.
+    final cleanModel = model.startsWith('models/') ? model.replaceFirst('models/', '') : model;
+
+    // Ensure baseUrl doesn't have a trailing slash before adding path
+    final cleanBaseUrl = baseUrl.endsWith('/') 
+        ? baseUrl.substring(0, baseUrl.length - 1) 
+        : baseUrl.trim();
+    
+    final fullUrl = '$cleanBaseUrl/chat/completions';
 
     try {
       final response = await _dio.post(
-        '$baseUrl/chat/completions',
+        fullUrl,
         data: {
-          'model': model,
+          'model': cleanModel,
           'messages': [
             {'role': 'system', 'content': systemPrompt},
             ...messages.map((m) => {'role': m.role, 'content': m.content}),
@@ -53,8 +70,22 @@ class DioLlmRepository implements LlmRepository {
       if (CancelToken.isCancel(e)) {
         throw Exception('Запрос отменен пользователем');
       }
-      if (e.response?.statusCode == 401) {
-        throw Exception('Ошибка API: 401 Unauthorized. Проверьте ваш API ключ в настройках.');
+      final statusCode = e.response?.statusCode;
+      if (statusCode == 404) {
+        throw Exception('Ошибка API: 404 Not Found. Неверный URL или модель.\n'
+            'URL: $fullUrl\n'
+            'Model: $cleanModel\n'
+            'Убедитесь, что в настройках Base URL: https://generativelanguage.googleapis.com/v1beta/openai');
+      }
+      if (statusCode == 401) {
+        throw Exception('Ошибка API: 401 Unauthorized. Проверьте ваш API ключ.');
+      }
+      if (statusCode == 429) {
+        throw Exception('Ошибка API: 429 Too Many Requests. Превышен лимит запросов.');
+      }
+      if (statusCode == 400) {
+        final errorData = e.response?.data;
+        throw Exception('Ошибка API: 400 Bad Request. ${errorData ?? e.message}');
       }
       throw Exception('Ошибка API: ${e.message}');
     } catch (e) {

@@ -8,6 +8,7 @@ import 'package:reflexive/core/di/injection_container.dart';
 import 'package:reflexive/presentation/screens/widgets/chat_input_area.dart';
 import 'package:reflexive/presentation/screens/widgets/reflection_view.dart';
 import 'package:reflexive/presentation/screens/widgets/response_view.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// The main chat screen where users interact with the Reflexive Agent.
 class ChatScreen extends StatefulWidget {
@@ -37,11 +38,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (_) => sl<ChatBloc>(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Reflexive Agent'),
+          title: Text(l10n.appTitle),
           actions: [
             IconButton(
               icon: const Icon(Icons.settings),
@@ -61,7 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: BlocBuilder<ChatBloc, ChatState>(
                     builder: (context, state) {
                       if (state is ChatInitial) {
-                        return const Center(child: Text('Enter your query to begin'));
+                        return Center(child: Text(l10n.appTitle));
                       }
                       if (state is ChatReflecting) {
                         return ReflectionView(state: state);

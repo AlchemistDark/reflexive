@@ -1,0 +1,57 @@
+{
+  "appTitle": "Reflexive Agent",
+  "settings": "Settings",
+  "general": "General",
+  "prompts": "Prompts",
+  "iteration": "Iteration: {count}",
+  "@iteration": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remaining": "Remaining: {seconds}s",
+  "@remaining": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "critic": "Critic:",
+  "generatorDraft": "Generator (Draft):",
+  "stoppingCriteria": "Stopping Criteria",
+  "maxDuration": "Max Duration (seconds)",
+  "maxIterations": "Max Iterations",
+  "requestDelay": "Request Delay (ms)",
+  "requestDelaySubtitle": "Delay between API calls to avoid rate limits",
+  "stopIfNoIssues": "Stop if no issues found",
+  "stopIfNoIssuesSubtitle": "Exit early if the Critic finds no flaws",
+  "reflectionStrategy": "Reflection Strategy",
+  "llmConfiguration": "LLM Configuration",
+  "provider": "Provider",
+  "apiKey": "API Key",
+  "baseUrl": "Base URL",
+  "modelName": "Model Name",
+  "modelNameHelper": "Type \"auto\" or \"default\" to use provider recommended model",
+  "resetToDefault": "Reset to default",
+  "resetToProviderDefault": "Reset to provider default",
+  "systemArchitecture": "System Architecture",
+  "systemArchitectureHelper": "General instructions for the agent",
+  "mathFormatting": "Math Formatting",
+  "mathFormattingHelper": "Instructions for LaTeX output",
+  "generatorRole": "Generator Role",
+  "generatorRoleHelper": "Prompt for creating the first draft",
+  "criticRole": "Critic Role (Standard)",
+  "criticRoleHelper": "Prompt for standard self-review",
+  "devilsAdvocateRole": "Devil's Advocate Role",
+  "devilsAdvocateRoleHelper": "Prompt for aggressive critique",
+  "editorRole": "Editor Role",
+  "editorRoleHelper": "Prompt for the final polishing stage",
+  "exportPrompts": "Export Prompts",
+  "importPrompts": "Import Prompts",
+  "exportSuccess": "Prompts exported to clipboard",
+  "importSuccess": "Prompts imported successfully",
+  "importError": "Failed to import prompts: Invalid format"
+}

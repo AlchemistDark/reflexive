@@ -42,6 +42,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final maxIterations = _settingsRepository.getMaxIterations();
     final stopOnNoIssues = _settingsRepository.getStopOnNoIssues();
     final reflectionMode = _settingsRepository.getReflectionMode();
+    final requestDelayMs = _settingsRepository.getRequestDelay();
+
+    // Fetch custom prompts
+    final systemArchitecture = _settingsRepository.getSystemArchitecturePrompt();
+    final mathPrompt = _settingsRepository.getMathPrompt();
+    final generatorPrompt = _settingsRepository.getGeneratorPrompt();
+    final criticPrompt = _settingsRepository.getCriticPrompt();
+    final devilsAdvocatePrompt = _settingsRepository.getDevilsAdvocatePrompt();
+    final editorPrompt = _settingsRepository.getEditorPrompt();
 
     // Create a custom preset based on user settings
     final effectivePreset = TimePreset(
@@ -63,7 +72,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           timePreset: effectivePreset,
           mode: reflectionMode,
           stopOnNoIssues: stopOnNoIssues,
+          delay: Duration(milliseconds: requestDelayMs),
           cancelToken: _cancelToken,
+          systemArchitecture: systemArchitecture,
+          mathPrompt: mathPrompt,
+          generatorPrompt: generatorPrompt,
+          criticPrompt: criticPrompt,
+          devilsAdvocatePrompt: devilsAdvocatePrompt,
+          editorPrompt: editorPrompt,
         ),
         onData: (step) {
           final internalStep = InternalStep(

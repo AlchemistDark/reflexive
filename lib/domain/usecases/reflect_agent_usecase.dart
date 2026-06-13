@@ -28,23 +28,33 @@ class ReflectAgentUseCase {
   /// [timePreset] defines the constraints (duration and iterations).
   /// [mode] defines the strategy used by the Critic agent.
   /// [stopOnNoIssues] if true, the process stops when the Critic returns "NO_ISSUES".
+  /// [delay] duration to wait between API calls.
   /// [cancelToken] can be used to abort the process.
   Stream<ReflectionStep> execute({
     required String query,
     required TimePreset timePreset,
     ReflectionMode mode = ReflectionMode.standard,
     bool stopOnNoIssues = true,
+    Duration delay = Duration.zero,
     Object? cancelToken,
+    String? systemArchitecture,
+    String? mathPrompt,
+    String? generatorPrompt,
+    String? criticPrompt,
+    String? devilsAdvocatePrompt,
+    String? editorPrompt,
   }) async* {
     final stopwatch = Stopwatch()..start();
     final timeBudget = timePreset.maxDuration.inMilliseconds;
 
+    final architecture = systemArchitecture ?? _systemArchitecture;
+    final math = mathPrompt ?? _mathPrompt;
+
     // 1. Initial generation
     String currentAnswer = await llmRepository.generate(
       systemPrompt:
-          "$_systemArchitecture\n"
-          "Current Role: GENERATOR. Create the first comprehensive draft of the answer. "
-          "Since you will later critique this draft yourself, try to make it as solid as possible from the start.$_mathPrompt",
+          "$architecture\n"
+          "${generatorPrompt ?? "Current Role: GENERATOR. Create the first comprehensive draft of the answer. Since you will later critique this draft yourself, try to make it as solid as possible from the start."}$math",
       messages: [ChatMessage(role: "user", content: query)],
       cancelToken: cancelToken,
     );
@@ -62,19 +72,21 @@ class ReflectAgentUseCase {
       iteration++;
       if (iteration > timePreset.maxIterations) break;
 
+      // Apply delay before next API call
+      if (delay > Duration.zero) {
+        await Future.delayed(delay);
+      }
+
       // 2. Critique (depending on the mode)
       final String criticSystemPrompt;
       if (mode == ReflectionMode.devilsAdvocate) {
         criticSystemPrompt =
-            "$_systemArchitecture\n"
-            "Current Role: CRITIC (Devil's Advocate). Now, objectively analyze YOUR OWN previous draft. "
-            "Search for hidden flaws, weak logic, and assumptions you might have missed. "
-            "Be brutally honest with yourself. Output your self-critique as a list. If perfect, output: NO_ISSUES.$_mathPrompt";
+            "$architecture\n"
+            "${devilsAdvocatePrompt ?? "Current Role: CRITIC (Devil's Advocate). Now, objectively analyze YOUR OWN previous draft. Search for hidden flaws, weak logic, and assumptions you might have missed. Be brutally honest with yourself. Output your self-critique as a list. If perfect, output: NO_ISSUES."}$math";
       } else {
         criticSystemPrompt =
-            "$_systemArchitecture\n"
-            "Current Role: CRITIC (Self-Review). Review your own previous draft for accuracy, clarity, and completeness. "
-            "Identify what YOU can do better. Output a list of improvements. If no changes are needed, output only: NO_ISSUES.$_mathPrompt";
+            "$architecture\n"
+            "${criticPrompt ?? "Current Role: CRITIC (Self-Review). Review your own previous draft for accuracy, clarity, and completeness. Identify what YOU can do better. Output a list of improvements. If no changes are needed, output only: NO_ISSUES."}$math";
       }
 
       final critique = await llmRepository.generate(
@@ -100,10 +112,8 @@ class ReflectAgentUseCase {
       // 3. Generation of improved answer
       final improved = await llmRepository.generate(
         systemPrompt:
-            "$_systemArchitecture\n"
-            "Current Role: EDITOR. This is the final stage of your reflection. "
-            "Combine your original draft and your own critique to produce a perfect, polished version. "
-            "Output ONLY the final answer content. Do not talk to the user about the process.$_mathPrompt",
+            "$architecture\n"
+            "${editorPrompt ?? "Current Role: EDITOR. This is the final stage of your reflection. Combine your original draft and your own critique to produce a perfect, polished version. Output ONLY the final answer content. Do not talk to the user about the process."}$math",
         messages: [
           ChatMessage(role: "user", content: "Original Query: $query"),
           ChatMessage(role: "assistant", content: "Your Previous Draft: $currentAnswer"),

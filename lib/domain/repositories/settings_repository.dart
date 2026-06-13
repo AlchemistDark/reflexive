@@ -50,4 +50,63 @@ abstract class SettingsRepository {
 
   /// Retrieves the currently selected LLM provider.
   LlmProvider getLlmProvider();
+
+  /// Persists the delay between requests in milliseconds.
+  Future<void> setRequestDelay(int milliseconds);
+
+  /// Retrieves the saved delay between requests in milliseconds.
+  int getRequestDelay();
+
+  /// Persists the system architecture prompt.
+  Future<void> setSystemArchitecturePrompt(String prompt);
+
+  /// Retrieves the system architecture prompt.
+  String getSystemArchitecturePrompt();
+
+  /// Persists the math formatting prompt.
+  Future<void> setMathPrompt(String prompt);
+
+  /// Retrieves the math formatting prompt.
+  String getMathPrompt();
+
+  /// Persists the prompt for the Generator role.
+  Future<void> setGeneratorPrompt(String prompt);
+
+  /// Retrieves the prompt for the Generator role.
+  String getGeneratorPrompt();
+
+  /// Persists the prompt for the Critic role.
+  Future<void> setCriticPrompt(String prompt);
+
+  /// Retrieves the prompt for the Critic role.
+  String getCriticPrompt();
+
+  /// Persists the prompt for the Devil's Advocate role.
+  Future<void> setDevilsAdvocatePrompt(String prompt);
+
+  /// Retrieves the prompt for the Devil's Advocate role.
+  String getDevilsAdvocatePrompt();
+
+  /// Persists the prompt for the Editor role.
+  Future<void> setEditorPrompt(String prompt);
+
+  /// Retrieves the prompt for the Editor role.
+  String getEditorPrompt();
+
+  /// Resets all prompts to their default values.
+  Future<void> resetAllPrompts();
+
+  /// Resets a specific prompt to its default value.
+  Future<void> resetSystemArchitecturePrompt();
+  Future<void> resetMathPrompt();
+  Future<void> resetGeneratorPrompt();
+  Future<void> resetCriticPrompt();
+  Future<void> resetDevilsAdvocatePrompt();
+  Future<void> resetEditorPrompt();
+
+  /// Exports the current prompt configurations as a JSON string.
+  String exportPrompts();
+
+  /// Imports prompt configurations from a JSON string.
+  Future<void> importPrompts(String json);
 }

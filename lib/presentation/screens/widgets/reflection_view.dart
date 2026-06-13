@@ -4,6 +4,7 @@ import 'package:reflexive/domain/entities/agent_role.dart';
 import 'package:reflexive/presentation/bloc/chat_state.dart';
 import 'package:reflexive/presentation/screens/widgets/code_highlighter_builder.dart';
 import 'package:reflexive/presentation/screens/widgets/math_builder.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// A widget that displays the ongoing reflection process.
 class ReflectionView extends StatelessWidget {
@@ -14,6 +15,7 @@ class ReflectionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -26,14 +28,14 @@ class ReflectionView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Iteration: ${state.currentIteration}'),
-              Text('Remaining: ${state.remainingTime.inSeconds}s'),
+              Text(l10n.iteration(state.currentIteration)),
+              Text(l10n.remaining(state.remainingTime.inSeconds)),
             ],
           ),
           const Divider(),
           if (state.lastUpdate != null) ...[
             Text(
-              state.lastRole == AgentRole.critic ? 'Critic:' : 'Generator (Draft):',
+              state.lastRole == AgentRole.critic ? l10n.critic : l10n.generatorDraft,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),

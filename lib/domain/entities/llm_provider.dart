@@ -1,6 +1,6 @@
 enum LlmProvider {
   openRouter('OpenRouter', 'https://openrouter.ai/api/v1', 'openrouter/auto'),
-  google('Google AI Studio (Gemini)', 'https://generativelanguage.googleapis.com/v1beta/openai', 'gemini-1.5-flash'),
+  google('Google AI Studio (Gemini)', 'https://generativelanguage.googleapis.com/v1beta/openai', 'gemini-3.5-flash'),
   openai('OpenAI', 'https://api.openai.com/v1', 'gpt-4o'),
   custom('Custom', '', '');
 

@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:reflexive/domain/entities/time_preset.dart';
 
 /// Base class for all events in the [ChatBloc].
 abstract class ChatEvent extends Equatable {

@@ -40,17 +40,15 @@ class MathBuilder extends MarkdownElementBuilder {
   }
 }
 
-/// Robust math syntax for the markdown parser.
+/// Robust math settings for the markdown parser.
 class LaTeXSettings {
   static List<md.InlineSyntax> get inlineSyntaxes => [
-        // Inline math: $...$
-        MathSyntax(r'\$((?:\\.|[^$])+)\$'),
-        // Inline math: \(...\)
-        MathSyntax(r'\\\(((?:\\.|[^\)])+)\\\)'),
-        // Block math as inline: \[...\]
-        MathSyntax(r'\\\[((?:\\.|[^\]])+)\\\]', display: true),
-        // Block math as inline: $$...$$
-        MathSyntax(r'\$\$((?:\\.|[^\$])+)\$\$', display: true),
+        // Inline math: \( ... \) or \\( ... \\)
+        MathSyntax(r'\\\\\\\((.*?)\\\\\\\)'),
+        MathSyntax(r'\\\\\((.*?)\\\\\)'),
+        MathSyntax(r'\\\((.*?)\\\)'),
+        // Inline math: $ ... $
+        MathSyntax(r'\$((?:\$|[^$])+)\$'),
       ];
 
   static List<md.BlockSyntax> get blockSyntaxes => [
@@ -64,8 +62,20 @@ class MathSyntax extends md.InlineSyntax {
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
-    final formula = match.group(match.groupCount) ?? '';
-    final element = md.Element('latex', [md.Text(formula.trim())]);
+    // Usually the formula is in group 1
+    final formula = match.group(1) ?? match.group(0) ?? '';
+    
+    // Clean up delimiters if they were captured
+    String cleanFormula = formula;
+    if (cleanFormula.startsWith(r'\(') && cleanFormula.endsWith(r'\)')) {
+      cleanFormula = cleanFormula.substring(2, cleanFormula.length - 2);
+    } else if (cleanFormula.startsWith(r'$') && cleanFormula.endsWith(r'$')) {
+      cleanFormula = cleanFormula.substring(1, cleanFormula.length - 1);
+    }
+
+    if (cleanFormula.isEmpty) return false;
+
+    final element = md.Element('latex', [md.Text(cleanFormula.trim())]);
     if (display) {
       element.attributes['display'] = 'true';
     }
@@ -75,55 +85,78 @@ class MathSyntax extends md.InlineSyntax {
 }
 
 class MathBlockSyntax extends md.BlockSyntax {
-  // Matches start of block: $$ or \[
   @override
-  RegExp get pattern => RegExp(r'^(\$\$|\\\[)');
+  RegExp get pattern => RegExp(r'^\s*(\$\$|\\\[|\\begin\{)');
 
   const MathBlockSyntax();
 
   @override
   md.Node? parse(md.BlockParser parser) {
     final firstLine = parser.current.content;
-    
-    // 1. Single-line block: $$ formula $$ or \[ formula \]
-    final oneLineMatch = RegExp(r'^(\$\$|\\\[)(.*?)(\$\$|\\\])$').firstMatch(firstLine.trim());
-    if (oneLineMatch != null) {
-      parser.advance();
-      // Wrapping in 'p' prevents the "Null check operator" crash in flutter_markdown
-      return md.Element('p', [
-        md.Element('latex', [md.Text(oneLineMatch.group(2)!.trim())])
-          ..attributes['display'] = 'true'
-      ]);
+    final firstLineTrimmed = firstLine.trim();
+
+    String? endDelim;
+    bool isStandardDelim = false;
+
+    if (firstLineTrimmed.startsWith(r'$$')) {
+      endDelim = r'$$';
+      isStandardDelim = true;
+    } else if (firstLineTrimmed.startsWith(r'\[')) {
+      endDelim = r'\]';
+      isStandardDelim = true;
+    } else if (firstLineTrimmed.startsWith(r'\begin{')) {
+      final match = RegExp(r'\\begin\{([a-z*]+)\}').firstMatch(firstLineTrimmed);
+      if (match != null) {
+        endDelim = '\\end{${match.group(1)}}';
+      }
     }
 
-    // 2. Multi-line block
+    endDelim ??= r'$$';
+
     final lines = <String>[];
-    String endDelim = firstLine.trim().startsWith(r'$$') ? r'$$' : r'\]';
-    
-    // Extract content from the first line (after delimiter)
-    var firstLineContent = firstLine.trim();
-    if (firstLineContent.startsWith(r'$$')) {
-      firstLineContent = firstLineContent.substring(2);
-    } else if (firstLineContent.startsWith(r'\[')) {
-      firstLineContent = firstLineContent.substring(2);
+    String content = firstLine;
+
+    if (isStandardDelim) {
+      final startDelim = firstLineTrimmed.startsWith(r'$$') ? r'$$' : r'\[';
+      final startIdx = content.indexOf(startDelim);
+      content = content.substring(startIdx + startDelim.length);
     }
-    
-    if (firstLineContent.isNotEmpty) lines.add(firstLineContent);
-    
-    parser.advance();
-    while (!parser.isDone) {
-      final line = parser.current.content;
-      if (line.contains(endDelim)) {
-        final endIdx = line.indexOf(endDelim);
-        final beforeEnd = line.substring(0, endIdx);
-        if (beforeEnd.trim().isNotEmpty) lines.add(beforeEnd);
-        parser.advance();
-        break;
+
+    if (content.contains(endDelim)) {
+      final endIdx = content.indexOf(endDelim);
+      if (isStandardDelim) {
+        final formula = content.substring(0, endIdx);
+        if (formula.trim().isNotEmpty) lines.add(formula);
+      } else {
+        lines.add(firstLine);
       }
-      lines.add(line);
       parser.advance();
+    } else {
+      if (isStandardDelim) {
+        if (content.trim().isNotEmpty) lines.add(content);
+      } else {
+        lines.add(firstLine);
+      }
+      parser.advance();
+
+      while (!parser.isDone) {
+        final line = parser.current.content;
+        if (line.contains(endDelim)) {
+          final endIdx = line.indexOf(endDelim);
+          if (isStandardDelim) {
+            final beforeEnd = line.substring(0, endIdx);
+            if (beforeEnd.trim().isNotEmpty) lines.add(beforeEnd);
+          } else {
+            lines.add(line);
+          }
+          parser.advance();
+          break;
+        }
+        lines.add(line);
+        parser.advance();
+      }
     }
-    
+
     return md.Element('p', [
       md.Element('latex', [md.Text(lines.join('\n').trim())])
         ..attributes['display'] = 'true'
